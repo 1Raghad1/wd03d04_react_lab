@@ -1,44 +1,69 @@
 import './App.css';
 import FilmDetails from './FilmDetails'
 import FilmListing from './FilmListing'
-import FlimRow from './FilmRow'
 import TMDB from './TMDB'
 import './normalize.css'
+import axios from "axios"
+
 
 import React, { Component } from 'react'
 export default class App extends Component {
   constructor(){
     super()
     this.handleFaveToggle = this.handleFaveToggle.bind(this)
+    this.state = {
+      films: TMDB.films,
+      faves:[],
+      current:{}
+    }
   }
-  state={
-    film:TMDB.films,
-    faves:[],
-    current:{}
-  }
-  handleFaveToggle=(e)=>{
-const faves= {...this.state.faves.slice()}
-const filmIndex=faves.indexOf(e.target)
-// filmIndex==-1?fave.push(e.target):fave.splice(filmIndex,1)
-filmIndex==-1?console.log('d'):console.log('a');
-this.setState({faves})
 
+  handleFaveToggle(film){
+    const faves = this.state.faves.slice();
+    const filmIndex = faves.indexOf(film);
+    if(filmIndex<0){
+    faves.push(film);
+    console.log(`Adding ${film.title} to faves...`)
+    }
+    else{
+      faves.splice(filmIndex, 1) 
+      console.log(`Removing ${film.title} to faves...`)
+    }
+    this.setState({faves});
   }
+
+
+
+  handleDetailsClick = (film) =>{
+    // console.log(TMDB.api_key)
+    const url = `https://api.themoviedb.org/3/movie/${film.id}
+    ?api_key=${TMDB.api_key}&append_to_response=videos,images&language=ar`
+
+    axios({
+      method: 'GET',
+      url: url
+    }).then(response => {
+      console.log(response) // take a look at what you get back!
+      console.log(`Fetching details for ${film.title}`);
+      this.setState({ current: response.data })
+    })
+
+
+}
 
   render() {
     return (
-      <div className="film-library">
-   
-       
-      <FilmListing film ={this.state.film} fave = {this.state.faves}  handleFaveToggle={() => this.handleFaveToggle} />
-
-      <div className="film-details">
-        <h1 className="section-title">DETAILS</h1>
-        <FilmDetails film={this.state.film} current={this.state.current} />
-        
+      <div className="App">
+        <div className="film-library">
+          <FilmListing films={this.state.films} 
+          faves={this.state.faves} 
+          onFaveToggle={this.handleFaveToggle}
+          handleDetailsClick={this.handleDetailsClick}
+          />
+         <FilmDetails films={this.state.current}/>
+        </div>
       </div>
-
-    </div>
     )
   }
 }
+
