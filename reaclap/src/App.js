@@ -30,7 +30,7 @@ this.setState({faves})
       <div className="film-library">
    
        
-      <FilmListing film ={this.state.film} fave = {this.state.faves}  handleFaveToggle={() => this.props.handleFaveToggle()} />
+      <FilmListing film ={this.state.film} fave = {this.state.faves}  handleFaveToggle={() => this.handleFaveToggle} />
 
       <div className="film-details">
         <h1 className="section-title">DETAILS</h1>
